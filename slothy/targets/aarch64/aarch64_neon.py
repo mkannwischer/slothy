@@ -3119,12 +3119,12 @@ class cmge(ASimdCompare): # pylint: disable=missing-docstring,invalid-name
 
 
 class Stack:
-    def spill(reg, loc):
+    def spill(reg, loc, stack_prefix="STACK_LOC_"):
         # TODO: Use store instruction
-        return f"str {reg}, [sp, #STACK_LOC_{loc}]"
-    def restore(reg, loc):
+        return f"str {reg}, [sp, #{stack_prefix}{loc}]"
+    def restore(reg, loc, stack_prefix="STACK_LOC_"):
         # TODO: Use load instruction
-        return  f"ldr {reg}, [sp, #STACK_LOC_{loc}]"
+        return  f"ldr {reg}, [sp, #{stack_prefix}{loc}]"
 
 # In a pair of vins writing both 64-bit lanes of a vector, mark the
 # target vector as output rather than input/output. This enables further

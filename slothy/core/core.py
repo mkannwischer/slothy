@@ -598,14 +598,16 @@ class Result(LockAttributes):
         d = self.config.placeholder_char
 
         def gen_restore(reg, loc, vis):
-            yield SourceLine(self.config.arch.Stack.restore(reg, loc)).\
+            yield SourceLine(self.config.arch.Stack.restore(reg, loc,
+                             stack_prefix=self.config.stack_location_prefix)).\
                 set_length(self.fixlen).\
                 set_comment(vis).\
                 add_tag("is_restore", True).\
                 add_tag("reads", f"stack_{loc}")
 
         def gen_spill(reg, loc, vis):
-            yield SourceLine(self.config.arch.Stack.spill(reg, loc)).\
+            yield SourceLine(self.config.arch.Stack.spill(reg, loc,
+                             stack_prefix=self.config.stack_location_prefix)).\
                 set_length(self.fixlen).\
                 set_comment(vis).\
                 add_tag("is_spill", True).\

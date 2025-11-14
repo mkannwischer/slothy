@@ -552,6 +552,18 @@ class Config(NestedPrint, LockAttributes):
         return self._absorb_spills
 
     @property
+    def stack_location_prefix(self):
+        """The prefix to use for stack location names in generated spill/restore code.
+
+        When SLOTHY generates stack spills, it uses symbolic stack location names
+        of the form '{prefix}{number}' (e.g., 'STACK_LOC_0', 'STACK_LOC_1', etc.).
+        This option allows customization of the prefix part.
+
+        Default: "STACK_LOC_"
+        """
+        return self._stack_location_prefix
+
+    @property
     def split_heuristic(self):
         """Trade-off between runtime and optimality: Split each code block
         to be optimized into a fixed number of subchunks and optimize them
@@ -1196,6 +1208,8 @@ class Config(NestedPrint, LockAttributes):
 
         self._absorb_spills = True
 
+        self._stack_location_prefix = "STACK_LOC_"
+
         self._split_heuristic = False
         self._split_heuristic_region = [0.0,1.0]
         self._split_heuristic_chunks = False
@@ -1388,6 +1402,9 @@ class Config(NestedPrint, LockAttributes):
     @absorb_spills.setter
     def absorb_spills(self, val):
         self._absorb_spills = val
+    @stack_location_prefix.setter
+    def stack_location_prefix(self, val):
+        self._stack_location_prefix = val
     @split_heuristic.setter
     def split_heuristic(self, val):
         self._split_heuristic = val
