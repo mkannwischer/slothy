@@ -66,32 +66,17 @@ xtmp1 .req x11
         str qform_\vec, [\base], #\inc
 .endm
 
-.macro vqrdmulh d,a,b
-        sqrdmulh \d\().8h, \a\().8h, \b\().8h
-.endm
-.macro vmlsq d,a,b,i
-        mls \d\().8h, \a\().8h, \b\().h[\i]
-.endm
-.macro vqrdmulhq d,a,b,i
-        sqrdmulh \d\().8h, \a\().8h, \b\().h[\i]
-.endm
-.macro vqdmulhq d,a,b,i
-        sqdmulh \d\().8h, \a\().8h, \b\().h[\i]
-.endm
-.macro vmulq d,a,b,i
-        mul \d\().8h, \a\().8h, \b\().h[\i]
-.endm
 
 .macro mulmodq dst, src, const, idx0, idx1
-        vmulq       \dst,  \src, \const, \idx0
-        vqrdmulhq   \src,  \src, \const, \idx1
-        vmlsq        \dst,  \src, consts, 0
+        mul \dst.4s, \src.4s, \const.s[\idx0]
+        sqrdmulh \src.4s, \src.4s, \const.s[\idx1]
+        mls \dst.4s, \src.4s, consts.4s[0]
 .endm
 
 .macro mulmod dst, src, const, const_twisted
         mul        \dst\().8h,  \src\().8h, \const\().8h
-        vqrdmulh   \src,  \src, \const_twisted
-        vmlsq      \dst,  \src, consts, 0
+        sqrdmulh \src.4s, \src.4s, \const_twisted.4s
+        mls \dst.4s, \src.4s, consts.4s[0]
 .endm
 
 .macro ct_butterfly a, b, root, idx0, idx1
@@ -102,8 +87,8 @@ xtmp1 .req x11
 
 .macro mulmod_v dst, src, const, const_twisted
         mul         \dst\().8h,  \src\().8h, \const\().8h
-        vqrdmulh    \src,  \src, \const_twisted
-        vmlsq       \dst,  \src, consts, 0
+        sqrdmulh \src.4s, \src.4s, \const_twisted.4s
+        mls \dst.4s, \src.4s, consts.4s[0]
 .endm
 
 .macro ct_butterfly_v a, b, root, root_twisted
@@ -113,9 +98,9 @@ xtmp1 .req x11
 .endm
 
 .macro barrett_reduce a
-        vqdmulhq tmp, \a, consts, 1
+        sqdmulh tmp.4s, \a.4s, consts.4s[1]
         srshr    tmp.8H, tmp.8H, #11
-        vmlsq    \a, tmp, consts, 0
+        mls \a.4s, tmp.4s, consts.4s[0]
 .endm
 
 .macro load_roots_123

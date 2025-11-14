@@ -53,23 +53,8 @@
 .macro vadd d,a,b
         add \d\().4s, \a\().4s, \b\().4s
 .endm
-.macro vqrdmulh d,a,b
-        sqrdmulh \d\().4s, \a\().4s, \b\().4s
-.endm
 .macro vmul d,a,b
         mul \d\().4s, \a\().4s, \b\().4s
-.endm
-.macro vmls d,a,b
-        mls \d\().4s, \a\().4s, \b\().4s
-.endm
-.macro vqrdmulhq d,a,b,i
-        sqrdmulh \d\().4s, \a\().4s, \b\().s[\i]
-.endm
-.macro vmulq d,a,b,i
-        mul \d\().4s, \a\().4s, \b\().s[\i]
-.endm
-.macro vmlsq d,a,b,i
-        mls \d\().4s, \a\().4s, \b\().s[\i]
 .endm
 .macro trn1_d d,a,b
         trn1 \d\().2d, \a\().2d, \b\().2d
@@ -85,27 +70,27 @@
 .endm
 
 .macro mulmodq dst, src, const, idx0, idx1
-        vmulq       \dst,  \src, \const, \idx0
-        vqrdmulhq   \src,  \src, \const, \idx1
-        vmls        \dst,  \src, modulus
+        mul \dst.4s, \src.4s, \const.s[\idx0]
+        sqrdmulh \src.4s, \src.4s, \const.s[\idx1]
+        mls \dst.4s, \src.4s, modulus.4s
 .endm
 
 .macro mulmod dst, src, const, const_twisted
         vmul       \dst,  \src, \const
-        vqrdmulh   \src,  \src, \const_twisted
-        vmls       \dst,  \src, modulus
+        sqrdmulh \src.4s, \src.4s, \const_twisted.4s
+        mls \dst.4s, \src.4s, modulus.4s
 .endm
 
 .macro barrett_reduce_single a
         srshr tmp.4S,  \a\().4S, #23
-        vmls   \a, tmp, modulus
+        mls \a.4s, tmp.4s, modulus.4s
 .endm
 
 .macro canonical_reduce a, modulus_half, neg_modulus_half, tmp1, tmp2
         cmge \tmp1\().4s, \neg_modulus_half\().4s, \a\().4s
         cmge \tmp2\().4s, \a\().4s, \modulus_half\().4s
         sub \tmp2\().4s, \tmp1\().4s, \tmp2\().4s
-        vmls \a, \tmp2, modulus
+        mls \a.4s, \tmp2.4s, modulus.4s
 .endm
 
 .macro gs_butterfly a, b, root, idx0, idx1
@@ -116,8 +101,8 @@
 
 .macro mulmod_v dst, src, const, const_twisted
         vmul        \dst,  \src, \const
-        vqrdmulh    \src,  \src, \const_twisted
-        vmls        \dst,  \src, modulus
+        sqrdmulh \src.4s, \src.4s, \const_twisted.4s
+        mls \dst.4s, \src.4s, modulus.4s
 .endm
 
 .macro gs_butterfly_v a, b, root, root_twisted

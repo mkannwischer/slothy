@@ -47,41 +47,6 @@
 .macro str_vi vec, base, inc
         str qform_\vec, [\base], #\inc
 .endm
-.macro vqrdmulh d,a,b
-        sqrdmulh \d\().4s, \a\().4s, \b\().4s
-.endm
-.macro vmla d,a,b
-        mla \d\().4s, \a\().4s, \b\().4s
-.endm
-.macro vqrdmulhq d,a,b,i
-        sqrdmulh \d\().4s, \a\().4s, \b\().s[\i]
-.endm
-.macro vmulq d,a,b,i
-        mul \d\().4s, \a\().4s, \b\().s[\i]
-.endm
-.macro vmlaq d,a,b,i
-        mla \d\().4s, \a\().4s, \b\().s[\i]
-        .endm
-.macro vmlsq d,a,b,i
-        mls \d\().4s, \a\().4s, \b\().s[\i]
-        .endm
-
-
-.macro mulmodq dst, src, const, idx0, idx1
-        vqrdmulhq   t2,  \src, \const, \idx1
-        vmulq       \dst,  \src, \const, \idx0
-        vmla       \dst,  t2, modulus
-.endm
-
-.macro mulmod dst, src, const, const_twisted
-        vqrdmulh   t2,  \src, \const_twisted
-        mul        \dst\().4s,  \src\().4s, \const\().4s
-        vmla       \dst,  t2, modulus
-.endm
-
-.macro ct_butterfly a, b, root, idx0, idx1
-        mulmodq  tmp, \b, \root, \idx0, \idx1
-        sub     \b\().4s,    \a\().4s, tmp.4s
         add     \a\().4s,    \a\().4s, tmp.4s
 .endm
 

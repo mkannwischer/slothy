@@ -33,35 +33,17 @@ xtmp1 .req x11
 .macro str_vi vec, base, inc
         str qform_\vec, [\base], #\inc
 .endm
-.macro vqrdmulh d,a,b
-        sqrdmulh \d\().4s, \a\().4s, \b\().4s
-.endm
-.macro vmls d,a,b
-        mls \d\().4s, \a\().4s, \b\().4s
-.endm
-.macro vqrdmulhq d,a,b,i
-        sqrdmulh \d\().4s, \a\().4s, \b\().s[\i]
-.endm
-.macro vqdmulhq d,a,b,i
-        sqdmulh \d\().4s, \a\().4s, \b\().4s[\i]
-.endm
-.macro vmulq d,a,b,i
-        mul \d\().4s, \a\().4s, \b\().s[\i]
-.endm
-.macro vmlsq d,a,b,i
-        mls \d\().4s, \a\().4s, \b\().s[\i]
-.endm
 
 .macro mulmodq dst, src, const, idx0, idx1
-        vqrdmulhq   t2,  \src, \const, \idx1
-        vmulq       \dst,  \src, \const, \idx0
-        vmlsq       \dst,  t2, consts, 0
+        sqrdmulh t2.4s, \src.4s, \const.s[\idx1]
+        mul \dst.4s, \src.4s, \const.s[\idx0]
+        mls \dst.4s, t2.4s, consts.4s[0]
 .endm
 
 .macro mulmod dst, src, const, const_twisted
-        vqrdmulh   t2,  \src, \const_twisted
+        sqrdmulh t2.4s, \src.4s, \const_twisted.4s
         mul        \dst\().4s,  \src\().4s, \const\().4s
-        vmlsq      \dst,  t2, consts, 0
+        mls \dst.4s, t2.4s, consts.4s[0]
 .endm
 
 .macro ct_butterfly a, b, root, idx0, idx1
@@ -78,7 +60,7 @@ xtmp1 .req x11
 
 .macro barrett_reduce_single a
         srshr    tmp.4S, \a\().4S, #23
-        vmlsq    \a, tmp, consts, 0
+        mls \a.4s, tmp.4s, consts.4s[0]
 .endm
 
 .macro barrett_reduce a0, a1, a2, a3

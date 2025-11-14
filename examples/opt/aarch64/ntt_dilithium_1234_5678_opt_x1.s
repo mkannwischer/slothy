@@ -47,48 +47,13 @@
 .macro str_vi vec, base, inc                        // slothy:no-unfold
         str qform_\vec, [\base], \inc
 .endm
-.macro vqrdmulh d,a,b
-        sqrdmulh \d\().4s, \a\().4s, \b\().4s
-.endm
-.macro vmla d,a,b
-        mla \d\().4s, \a\().4s, \b\().4s
-.endm
-.macro vqrdmulhq d,a,b,i
-        sqrdmulh \d\().4s, \a\().4s, \b\().s[\i]
-.endm
-.macro vmulq d,a,b,i
-        mul \d\().4s, \a\().4s, \b\().s[\i]
-.endm
-.macro vmlaq d,a,b,i
-        mla \d\().4s, \a\().4s, \b\().s[\i]
-        .endm
-.macro vmlsq d,a,b,i
-        mls \d\().4s, \a\().4s, \b\().s[\i]
-        .endm
-
-
-.macro mulmodq dst, src, const, idx0, idx1
-        vmulq       \dst,  \src, \const, \idx0
-        vqrdmulhq   \src,  \src, \const, \idx1
-        vmla        \dst,  \src, modulus
-.endm
-
-.macro mulmod dst, src, const, const_twisted
-        mul        \dst\().4s,  \src\().4s, \const\().4s
-        vqrdmulh   \src,  \src, \const_twisted
-        vmla       \dst,  \src, modulus
-.endm
-
-.macro ct_butterfly a, b, root, idx0, idx1
-        mulmodq  tmp, \b, \root, \idx0, \idx1
-        sub     \b\().4s,    \a\().4s, tmp.4s
         add     \a\().4s,    \a\().4s, tmp.4s
 .endm
 
 .macro mulmod_v dst, src, const, const_twisted
         mul        \dst\().4s,  \src\().4s, \const\().4s
-        vqrdmulh    \src,  \src, \const_twisted
-        vmla        \dst,  \src, modulus
+        sqrdmulh \src.4s, \src.4s, \const_twisted.4s
+        mla \dst.4s, \src.4s, modulus.4s
 .endm
 
 .macro ct_butterfly_v a, b, root, root_twisted
