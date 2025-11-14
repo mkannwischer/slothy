@@ -64,6 +64,18 @@ verifies them through automated equivalence-checking in [HOL-Light](https://hol-
   of the Arm EndpointAI project in [this
   commit](https://github.com/ARM-software/EndpointAI/commit/817bb57d8a4a604538a04627851f5e9adb5f08fc).
 
+## CI Performance Monitoring
+
+SLOTHY includes an automated CI performance dashboard that tracks regression test execution times to help detect performance regressions. The dashboard:
+
+- **Visualizes CI timing trends** with interactive stacked bar charts showing both aggregate duration and individual job execution times
+- **Updates automatically** on every merge to the main branch
+- **Provides statistics** including average, minimum, and maximum CI durations
+
+📊 **[View the CI Performance Dashboard](.github/ci-metrics/dashboard.html)**
+
+For more details, see the [CI Metrics README](.github/ci-metrics/README.md).
+
 ## Installation
 
 ### Requirements

@@ -1,0 +1,45 @@
+name: CI Performance Metrics
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:  # Allow manual trigger for testing
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  collect-metrics:
+    name: Collect CI Metrics
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Get full history for better tracking
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install requests matplotlib numpy
+
+    - name: Collect CI timing data
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        python3 .github/scripts/collect_ci_metrics.py
+
+    - name: Generate dashboard
+      run: |
+        python3 .github/scripts/generate_dashboard.py
+
+    - name: Commit and push metrics
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add .github/ci-metrics/
+        git diff --staged --quiet || git commit -m "Update CI performance metrics [skip ci]"
+        git push
